@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">JustAnotherRealTimeTrackingApp</string>
+    <string name="app_name">Just another real time trackingApp</string>
+    <string name="start">Start</string>
+    <string name="_30">30</string>
+    <string name="stop">Stop</string>
+    <string name="how_often_to_update_location_in_seconds">How often to update location in seconds:</string>
 </resources>
