@@ -1,6 +1,8 @@
 package com.milosev.justanotherrealtimetrackingapp
 
+import android.content.ComponentName
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -25,6 +27,9 @@ class MainActivity : AppCompatActivity() {
 
         val btnStop: Button = findViewById<View>(R.id.btnStop) as Button
         btnStop.setOnClickListener {
+            val component = ComponentName(this, BroadcastTickReceiver::class.java)
+            packageManager.setComponentEnabledSetting(component, PackageManager.COMPONENT_ENABLED_STATE_DISABLED , PackageManager.DONT_KILL_APP)
+
             val intent = Intent(this, ForegroundTickService::class.java)
             intent.action = "stopForegroundTickService"
             startForegroundService(intent)
