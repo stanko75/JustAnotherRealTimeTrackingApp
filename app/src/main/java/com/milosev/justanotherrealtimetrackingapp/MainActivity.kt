@@ -19,11 +19,12 @@ class MainActivity : AppCompatActivity() {
 
         val btnStart: Button = findViewById<View>(R.id.btnStart) as Button
         btnStart.setOnClickListener {
-            val intent = Intent(this, ForegroundTickService::class.java)
-
+            val location = LocationClass(this)
+            location.requestLocationUpdates(this)
             val numOfSecondsForTick: TextView =
                 findViewById<View>(R.id.txtRequestUpdates) as TextView
 
+            val intent = Intent(this, ForegroundTickService::class.java)
             intent.action = "startForegroundTickService"
             intent.putExtra("numOfSecondsForTick", numOfSecondsForTick.text)
             startForegroundService(intent)

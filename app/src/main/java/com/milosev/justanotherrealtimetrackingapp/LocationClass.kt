@@ -1,6 +1,11 @@
 package com.milosev.justanotherrealtimetrackingapp
 
+import android.Manifest
+import android.app.Activity
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Looper
+import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -49,6 +54,41 @@ class LocationClass
                 }
             }
         }
+    }
+
+    fun requestLocationUpdates(context: Context) {
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    context as Activity,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+            ) {
+                return
+            } else {
+                // No explanation needed, we can request the permission.
+                requestLocationPermission(context)
+            }
+        }
+        fusedLocationClient.requestLocationUpdates(
+            locationRequest, locationCallback, Looper.getMainLooper()
+        )
+    }
+
+    private fun requestLocationPermission(context: Context) {
+        ActivityCompat.requestPermissions(
+            context as Activity,
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+            ),
+            99
+        )
     }
 
     fun writeFileOnInternalStorage(mcoContext: Context, sFileName: String?, sBody: String?) {
