@@ -7,6 +7,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import androidx.annotation.RequiresApi
@@ -14,9 +15,8 @@ import androidx.core.app.NotificationCompat
 
 class ForegroundTickService : Service() {
 
-    override fun onBind(intent: Intent): IBinder? {
-        println("Return the communication channel to the service.")
-        return null
+    override fun onBind(intent: Intent): IBinder {
+        return Binder()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -26,6 +26,8 @@ class ForegroundTickService : Service() {
                 startForeground(101, createNotification())
             }
             "stopForegroundTickService" -> {
+                stopForeground(true)
+                stopSelfResult(startId)
             }
         }
         return START_STICKY
