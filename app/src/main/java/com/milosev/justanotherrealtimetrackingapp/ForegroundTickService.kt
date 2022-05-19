@@ -36,11 +36,9 @@ class ForegroundTickService : Service(), CoroutineScope by MainScope() {
                 }
                 job = launch {
                     while (true) {
-                        val myIntent = Intent(
-                            context,
-                            BroadcastTickReceiver::class.java
-                        ).setAction("TickLocation")
-                        sendBroadcast(myIntent)
+                        val serviceIntent = Intent(context, BroadcastTickReceiver::class.java).setAction("TickLocation")
+                        serviceIntent.putExtra("numOfSecondsForTick", numOfSecondsForTick)
+                        sendBroadcast(serviceIntent)
                         delay(numOfSecondsForTick.toLong() * 1_000)
                     }
                 }
