@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.TextView
 import androidx.annotation.RequiresApi
 
 class MainActivity : AppCompatActivity() {
@@ -19,14 +20,23 @@ class MainActivity : AppCompatActivity() {
         val btnStart: Button = findViewById<View>(R.id.btnStart) as Button
         btnStart.setOnClickListener {
             val intent = Intent(this, ForegroundTickService::class.java)
+
+            val numOfSecondsForTick: TextView =
+                findViewById<View>(R.id.txtRequestUpdates) as TextView
+
             intent.action = "startForegroundTickService"
+            intent.putExtra("numOfSecondsForTick", numOfSecondsForTick.text)
             startForegroundService(intent)
         }
 
         val btnStop: Button = findViewById<View>(R.id.btnStop) as Button
         btnStop.setOnClickListener {
             val component = ComponentName(this, BroadcastTickReceiver::class.java)
-            packageManager.setComponentEnabledSetting(component, PackageManager.COMPONENT_ENABLED_STATE_DISABLED , PackageManager.DONT_KILL_APP)
+            packageManager.setComponentEnabledSetting(
+                component,
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP
+            )
 
             val intent = Intent(this, ForegroundTickService::class.java)
             intent.action = "stopForegroundTickService"

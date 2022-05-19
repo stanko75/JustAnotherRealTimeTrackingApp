@@ -13,11 +13,16 @@ class BroadcastTickReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
             "startBroadcastTickReceiver" -> {
-                val startBroadcastTickReceiverIntent = Intent(context, MainActivity::class.java).setAction("mainActivityReceiver")
-                LocalBroadcastManager.getInstance(context).sendBroadcast(startBroadcastTickReceiverIntent)
+                val startBroadcastTickReceiverIntent =
+                    Intent(context, MainActivity::class.java).setAction("mainActivityReceiver")
+                LocalBroadcastManager.getInstance(context)
+                    .sendBroadcast(startBroadcastTickReceiverIntent)
             }
             "restartForegroundTickService" -> {
-                val restartForegroundTickServiceIntent = Intent(context, ForegroundTickService::class.java).setAction("startForegroundTickService")
+                val restartForegroundTickServiceIntent = Intent(
+                    context,
+                    ForegroundTickService::class.java
+                ).setAction("startForegroundTickService")
                 context.startForegroundService(restartForegroundTickServiceIntent)
             }
         }

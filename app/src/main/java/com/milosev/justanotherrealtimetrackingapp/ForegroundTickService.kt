@@ -29,11 +29,19 @@ class ForegroundTickService : Service(), CoroutineScope by MainScope() {
                 startForeground(101, createNotification())
 
                 val context = this
+                val bundle = intent.extras
+                var numOfSecondsForTick = bundle!!.getString("numOfSecondsForTick")
+                if (numOfSecondsForTick == null) {
+                    numOfSecondsForTick = "30"
+                }
                 job = launch {
-                    while(true) {
-                        val myIntent = Intent(context, BroadcastTickReceiver::class.java).setAction("TickLocation")
+                    while (true) {
+                        val myIntent = Intent(
+                            context,
+                            BroadcastTickReceiver::class.java
+                        ).setAction("TickLocation")
                         sendBroadcast(myIntent)
-                        delay(1_000)
+                        delay(numOfSecondsForTick.toLong() * 1_000)
                     }
                 }
             }
@@ -65,9 +73,7 @@ class ForegroundTickService : Service(), CoroutineScope by MainScope() {
     private fun createNotificationChannel(): String {
         val channelId = "Foreground_TickService"
         val channel = NotificationChannel(
-            channelId
-            ,"Foreground tick service"
-            , NotificationManager.IMPORTANCE_LOW
+            channelId, "Foreground tick service", NotificationManager.IMPORTANCE_LOW
         )
         channel.lightColor = Color.RED
         channel.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
