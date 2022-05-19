@@ -12,8 +12,11 @@ import android.os.Build
 import android.os.IBinder
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import kotlinx.coroutines.*
 
-class ForegroundTickService : Service() {
+class ForegroundTickService : Service(), CoroutineScope by MainScope() {
+
+    private var job: Job? = null
 
     override fun onBind(intent: Intent): IBinder {
         return Binder()
@@ -24,8 +27,18 @@ class ForegroundTickService : Service() {
         when (intent?.action) {
             "startForegroundTickService" -> {
                 startForeground(101, createNotification())
+
+                val context = this
+                job = launch {
+                    while(true) {
+                        val myIntent = Intent(context, BroadcastTickReceiver::class.java).setAction("TickLocation")
+                        sendBroadcast(myIntent)
+                        delay(1_000)
+                    }
+                }
             }
             "stopForegroundTickService" -> {
+                job?.cancel()
                 stopForeground(true)
                 stopSelfResult(startId)
             }

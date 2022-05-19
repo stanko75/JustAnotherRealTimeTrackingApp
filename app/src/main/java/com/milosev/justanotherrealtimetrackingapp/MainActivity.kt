@@ -16,8 +16,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
-
         val btnStart: Button = findViewById<View>(R.id.btnStart) as Button
         btnStart.setOnClickListener {
             val intent = Intent(this, ForegroundTickService::class.java)
