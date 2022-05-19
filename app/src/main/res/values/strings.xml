@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Just another real time trackingApp</string>
+    <string name="app_name">TrackMe</string>
     <string name="start">Start</string>
     <string name="_30">30</string>
     <string name="stop">Stop</string>
