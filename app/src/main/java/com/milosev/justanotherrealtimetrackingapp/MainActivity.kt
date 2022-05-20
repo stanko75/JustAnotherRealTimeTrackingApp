@@ -1,7 +1,6 @@
 package com.milosev.justanotherrealtimetrackingapp
 
-import android.content.ComponentName
-import android.content.Intent
+import android.content.*
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -10,26 +9,52 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 class MainActivity : AppCompatActivity() {
+
+    private val broadcastTickReceiver: BroadcastReceiver = BroadcastTickReceiver()
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val filter = IntentFilter(IntentAction.TICK_LOCATION)
+        registerReceiver(broadcastTickReceiver, filter)
+
+        val broadCastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(contxt: Context?, intent: Intent?) {
+                when (intent?.action) {
+                    IntentAction.TICK_LOCATION -> {
+                        println("test")
+                    }
+                }
+            }
+        }
+
+        LocalBroadcastManager.getInstance(this)
+            .registerReceiver(broadCastReceiver, IntentFilter(IntentAction.TICK_LOCATION))
+
         val btnStart: Button = findViewById<View>(R.id.btnStart) as Button
         btnStart.setOnClickListener {
-            val location = LocationClass(this)
-            location.requestLocationUpdates(this)
+
+            val component = ComponentName(this, BroadcastTickReceiver::class.java)
+            packageManager.setComponentEnabledSetting(
+                component,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP
+            )
+
             val numOfSecondsForTick: TextView =
                 findViewById<View>(R.id.txtRequestUpdates) as TextView
             var strNumOfSecondsForTick: String = numOfSecondsForTick.text.toString()
             if (strNumOfSecondsForTick.isEmpty()) strNumOfSecondsForTick = "30"
 
-            val intent = Intent(this, ForegroundTickService::class.java)
-            intent.action = IntentAction.START_FOREGROUND_TICK_SERVICE
-            intent.putExtra(IntentExtras.NUM_OF_SECONDS_FOR_TICK, strNumOfSecondsForTick.toLong())
-            startForegroundService(intent)
+            val intentStartForegroundTickService = Intent(this, ForegroundTickService::class.java)
+            intentStartForegroundTickService.action = IntentAction.START_FOREGROUND_TICK_SERVICE
+            intentStartForegroundTickService.putExtra(IntentExtras.NUM_OF_SECONDS_FOR_TICK, strNumOfSecondsForTick.toLong())
+            startForegroundService(intentStartForegroundTickService)
         }
 
         val btnStop: Button = findViewById<View>(R.id.btnStop) as Button
@@ -41,9 +66,9 @@ class MainActivity : AppCompatActivity() {
                 PackageManager.DONT_KILL_APP
             )
 
-            val intent = Intent(this, ForegroundTickService::class.java)
-            intent.action = IntentAction.STOP_FOREGROUND_TICK_SERVICE
-            startForegroundService(intent)
+            val intentStopForegroundTickService = Intent(this, ForegroundTickService::class.java)
+            intentStopForegroundTickService.action = IntentAction.STOP_FOREGROUND_TICK_SERVICE
+            startForegroundService(intentStopForegroundTickService)
         }
     }
 }

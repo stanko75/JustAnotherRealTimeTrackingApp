@@ -18,12 +18,25 @@ class BroadcastTickReceiver : BroadcastReceiver() {
                 LocalBroadcastManager.getInstance(context)
                     .sendBroadcast(startBroadcastTickReceiverIntent)
             }
+
+            IntentAction.RESTART_FOREGROUND_TICK_SERVICE -> {
+                val restartBroadcastTickReceiverIntent =
+                    Intent(context, ForegroundTickService::class.java)
+                context.startForegroundService(restartBroadcastTickReceiverIntent)
+            }
+
             IntentAction.STOP_FOREGROUND_TICK_SERVICE -> {
                 val restartForegroundTickServiceIntent = Intent(
                     context,
                     ForegroundTickService::class.java
                 ).setAction(IntentAction.STOP_FOREGROUND_TICK_SERVICE)
                 context.startForegroundService(restartForegroundTickServiceIntent)
+            }
+
+            IntentAction.TICK_LOCATION -> {
+                val mainActivityIntent = Intent(context, MainActivity::class.java).setAction(IntentAction.TICK_LOCATION)
+                mainActivityIntent.putExtra("message", "test")
+                LocalBroadcastManager.getInstance(context).sendBroadcast(mainActivityIntent)
             }
         }
     }

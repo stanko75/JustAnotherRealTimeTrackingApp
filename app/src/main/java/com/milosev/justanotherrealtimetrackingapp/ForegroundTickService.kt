@@ -35,6 +35,10 @@ class ForegroundTickService : Service(), CoroutineScope by MainScope() {
                         val serviceIntent = Intent(context, BroadcastTickReceiver::class.java).setAction(IntentAction.TICK_LOCATION)
                         serviceIntent.putExtra(IntentExtras.NUM_OF_SECONDS_FOR_TICK, numOfSecondsForTick)
                         sendBroadcast(serviceIntent)
+
+                        val location = LocationClass(context)
+                        location.requestLocationUpdates(context)
+
                         delay(numOfSecondsForTick * 1_000)
                     }
                 }
@@ -74,5 +78,17 @@ class ForegroundTickService : Service(), CoroutineScope by MainScope() {
         val service = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         service.createNotificationChannel(channel)
         return channelId
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        val restartForegroundTickService = Intent(this, BroadcastTickReceiver::class.java).setAction(IntentAction.RESTART_FOREGROUND_TICK_SERVICE)
+        sendBroadcast(restartForegroundTickService)
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        val restartForegroundTickService = Intent(this, BroadcastTickReceiver::class.java).setAction(IntentAction.RESTART_FOREGROUND_TICK_SERVICE)
+        sendBroadcast(restartForegroundTickService)
     }
 }
