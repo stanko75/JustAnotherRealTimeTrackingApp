@@ -1,11 +1,13 @@
 package com.milosev.justanotherrealtimetrackingapp
 
+import android.app.Activity
 import android.content.*
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.RequiresApi
@@ -38,6 +40,9 @@ class MainActivity : AppCompatActivity() {
 
         val btnStart: Button = findViewById<View>(R.id.btnStart) as Button
         btnStart.setOnClickListener {
+
+            val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputMethodManager.hideSoftInputFromWindow(it.windowToken, 0)
 
             val component = ComponentName(this, BroadcastTickReceiver::class.java)
             packageManager.setComponentEnabledSetting(
