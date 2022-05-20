@@ -23,10 +23,12 @@ class MainActivity : AppCompatActivity() {
             location.requestLocationUpdates(this)
             val numOfSecondsForTick: TextView =
                 findViewById<View>(R.id.txtRequestUpdates) as TextView
+            var strNumOfSecondsForTick: String = numOfSecondsForTick.text.toString()
+            if (strNumOfSecondsForTick.isEmpty()) strNumOfSecondsForTick = "30"
 
             val intent = Intent(this, ForegroundTickService::class.java)
-            intent.action = "startForegroundTickService"
-            intent.putExtra("numOfSecondsForTick", numOfSecondsForTick.text)
+            intent.action = IntentAction.START_FOREGROUND_TICK_SERVICE
+            intent.putExtra(IntentExtras.NUM_OF_SECONDS_FOR_TICK, strNumOfSecondsForTick.toLong())
             startForegroundService(intent)
         }
 
@@ -40,7 +42,7 @@ class MainActivity : AppCompatActivity() {
             )
 
             val intent = Intent(this, ForegroundTickService::class.java)
-            intent.action = "stopForegroundTickService"
+            intent.action = IntentAction.STOP_FOREGROUND_TICK_SERVICE
             startForegroundService(intent)
         }
     }

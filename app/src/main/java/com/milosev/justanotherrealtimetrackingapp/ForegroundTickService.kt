@@ -25,25 +25,21 @@ class ForegroundTickService : Service(), CoroutineScope by MainScope() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
-            "startForegroundTickService" -> {
+            IntentAction.START_FOREGROUND_TICK_SERVICE -> {
                 startForeground(101, createNotification())
 
                 val context = this
-                val bundle = intent.extras
-                var numOfSecondsForTick = bundle!!.getString("numOfSecondsForTick")
-                if (numOfSecondsForTick == null) {
-                    numOfSecondsForTick = "30"
-                }
+                val numOfSecondsForTick = intent.getLongExtra (IntentExtras.NUM_OF_SECONDS_FOR_TICK, 30)
                 job = launch {
                     while (true) {
-                        val serviceIntent = Intent(context, BroadcastTickReceiver::class.java).setAction("TickLocation")
-                        serviceIntent.putExtra("numOfSecondsForTick", numOfSecondsForTick)
+                        val serviceIntent = Intent(context, BroadcastTickReceiver::class.java).setAction(IntentAction.TICK_LOCATION)
+                        serviceIntent.putExtra(IntentExtras.NUM_OF_SECONDS_FOR_TICK, numOfSecondsForTick)
                         sendBroadcast(serviceIntent)
-                        delay(numOfSecondsForTick.toLong() * 1_000)
+                        delay(numOfSecondsForTick * 1_000)
                     }
                 }
             }
-            "stopForegroundTickService" -> {
+            IntentAction.STOP_FOREGROUND_TICK_SERVICE -> {
                 job?.cancel()
                 stopForeground(true)
                 stopSelfResult(startId)
