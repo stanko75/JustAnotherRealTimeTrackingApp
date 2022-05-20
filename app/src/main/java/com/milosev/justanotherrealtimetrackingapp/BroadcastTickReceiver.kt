@@ -33,9 +33,10 @@ class BroadcastTickReceiver : BroadcastReceiver() {
                 context.startForegroundService(restartForegroundTickServiceIntent)
             }
 
-            IntentAction.TICK_LOCATION -> {
-                val mainActivityIntent = Intent(context, MainActivity::class.java).setAction(IntentAction.TICK_LOCATION)
-                mainActivityIntent.putExtra("message", "test")
+            IntentAction.NUM_OF_TICKS -> {
+                val mainActivityIntent = Intent(context, MainActivity::class.java).setAction(IntentAction.NUM_OF_TICKS)
+                val numOfTicks = intent.getIntExtra (IntentExtras.NUM_OF_TICKS, 30)
+                mainActivityIntent.putExtra(IntentExtras.NUM_OF_TICKS, numOfTicks)
                 LocalBroadcastManager.getInstance(context).sendBroadcast(mainActivityIntent)
             }
         }

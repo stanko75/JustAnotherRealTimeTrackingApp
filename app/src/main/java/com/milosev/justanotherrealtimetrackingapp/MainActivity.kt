@@ -22,27 +22,44 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val filter = IntentFilter(IntentAction.TICK_LOCATION)
+        val filter = IntentFilter(IntentAction.NUM_OF_TICKS)
         registerReceiver(broadcastTickReceiver, filter)
 
+        val btnStop: Button = findViewById<View>(R.id.btnStop) as Button
+        val btnStart: Button = findViewById<View>(R.id.btnStart) as Button
+
         val broadCastReceiver = object : BroadcastReceiver() {
-            override fun onReceive(contxt: Context?, intent: Intent?) {
-                when (intent?.action) {
-                    IntentAction.TICK_LOCATION -> {
-                        println("test")
+            override fun onReceive(context: Context, intent: Intent) {
+                when (intent.action) {
+                    IntentAction.NUM_OF_TICKS -> {
+                        val numOfTicks = intent.getIntExtra (IntentExtras.NUM_OF_TICKS, 30)
+                        val numberOfTicks: TextView =
+                            findViewById<View>(R.id.textViewNumberOfTicks) as TextView
+                        numberOfTicks.text = numOfTicks.toString()
+
+                        btnStart.isEnabled = false
+                        btnStop.isEnabled = true
                     }
                 }
             }
         }
 
         LocalBroadcastManager.getInstance(this)
-            .registerReceiver(broadCastReceiver, IntentFilter(IntentAction.TICK_LOCATION))
+            .registerReceiver(broadCastReceiver, IntentFilter(IntentAction.NUM_OF_TICKS))
 
-        val btnStart: Button = findViewById<View>(R.id.btnStart) as Button
+        btnStart.isEnabled = true
+        btnStop.isEnabled = false
+
         btnStart.setOnClickListener {
+            btnStart.isEnabled = false
+            btnStop.isEnabled = true
 
             val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
             inputMethodManager.hideSoftInputFromWindow(it.windowToken, 0)
+
+            val numberOfTicks: TextView =
+                findViewById<View>(R.id.textViewNumberOfTicks) as TextView
+            numberOfTicks.text = "0"
 
             val component = ComponentName(this, BroadcastTickReceiver::class.java)
             packageManager.setComponentEnabledSetting(
@@ -62,8 +79,10 @@ class MainActivity : AppCompatActivity() {
             startForegroundService(intentStartForegroundTickService)
         }
 
-        val btnStop: Button = findViewById<View>(R.id.btnStop) as Button
         btnStop.setOnClickListener {
+            btnStart.isEnabled = true
+            btnStop.isEnabled = false
+
             val component = ComponentName(this, BroadcastTickReceiver::class.java)
             packageManager.setComponentEnabledSetting(
                 component,

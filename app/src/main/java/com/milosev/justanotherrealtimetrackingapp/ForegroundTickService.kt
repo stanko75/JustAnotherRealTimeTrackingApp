@@ -30,11 +30,13 @@ class ForegroundTickService : Service(), CoroutineScope by MainScope() {
 
                 val context = this
                 val numOfSecondsForTick = intent.getLongExtra (IntentExtras.NUM_OF_SECONDS_FOR_TICK, 30)
+                var numOfTicks = 0
                 job = launch {
                     while (true) {
-                        val serviceIntent = Intent(context, BroadcastTickReceiver::class.java).setAction(IntentAction.TICK_LOCATION)
-                        serviceIntent.putExtra(IntentExtras.NUM_OF_SECONDS_FOR_TICK, numOfSecondsForTick)
+                        val serviceIntent = Intent(context, BroadcastTickReceiver::class.java).setAction(IntentAction.NUM_OF_TICKS)
+                        serviceIntent.putExtra(IntentExtras.NUM_OF_TICKS, numOfTicks)
                         sendBroadcast(serviceIntent)
+                        numOfTicks += 1
 
                         val location = LocationClass(context)
                         location.requestLocationUpdates(context)
