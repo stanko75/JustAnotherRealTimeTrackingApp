@@ -37,8 +37,8 @@ class MainActivity : AppCompatActivity() {
                             findViewById<View>(R.id.textViewNumberOfTicks) as TextView
                         numberOfTicks.text = numOfTicks.toString()
 
-                        btnStart.isEnabled = false
-                        btnStop.isEnabled = true
+                        EnableStartButton(false, btnStart, btnStop)
+
                     }
                 }
             }
@@ -47,14 +47,14 @@ class MainActivity : AppCompatActivity() {
         LocalBroadcastManager.getInstance(this)
             .registerReceiver(broadCastReceiver, IntentFilter(IntentAction.NUM_OF_TICKS))
 
-        btnStart.isEnabled = true
-        btnStop.isEnabled = false
+        EnableStartButton(true, btnStart, btnStop)
 
         btnStart.setOnClickListener {
-            btnStart.isEnabled = false
-            btnStop.isEnabled = true
 
-            val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+            EnableStartButton(false, btnStart, btnStop)
+
+            val inputMethodManager =
+                getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
             inputMethodManager.hideSoftInputFromWindow(it.windowToken, 0)
 
             val numberOfTicks: TextView =
@@ -73,15 +73,19 @@ class MainActivity : AppCompatActivity() {
             var strNumOfSecondsForTick: String = numOfSecondsForTick.text.toString()
             if (strNumOfSecondsForTick.isEmpty()) strNumOfSecondsForTick = "30"
 
-            val intentStartForegroundTickService = Intent(this, ForegroundTickService::class.java)
+            val intentStartForegroundTickService =
+                Intent(this, ForegroundTickService::class.java)
             intentStartForegroundTickService.action = IntentAction.START_FOREGROUND_TICK_SERVICE
-            intentStartForegroundTickService.putExtra(IntentExtras.NUM_OF_SECONDS_FOR_TICK, strNumOfSecondsForTick.toLong())
+            intentStartForegroundTickService.putExtra(
+                IntentExtras.NUM_OF_SECONDS_FOR_TICK,
+                strNumOfSecondsForTick.toLong()
+            )
             startForegroundService(intentStartForegroundTickService)
         }
 
         btnStop.setOnClickListener {
-            btnStart.isEnabled = true
-            btnStop.isEnabled = false
+
+            EnableStartButton(true, btnStart, btnStop)
 
             val component = ComponentName(this, BroadcastTickReceiver::class.java)
             packageManager.setComponentEnabledSetting(
@@ -94,5 +98,10 @@ class MainActivity : AppCompatActivity() {
             intentStopForegroundTickService.action = IntentAction.STOP_FOREGROUND_TICK_SERVICE
             startForegroundService(intentStopForegroundTickService)
         }
+    }
+
+    fun EnableStartButton(enable: Boolean, btnStart: Button, btnStop: Button) {
+        btnStart.isEnabled = enable
+        btnStop.isEnabled = !btnStart.isEnabled
     }
 }
