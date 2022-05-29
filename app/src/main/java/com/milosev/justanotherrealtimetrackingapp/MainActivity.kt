@@ -1,5 +1,6 @@
 package com.milosev.justanotherrealtimetrackingapp
 
+import android.Manifest
 import android.app.Activity
 import android.content.*
 import android.content.pm.PackageManager
@@ -11,6 +12,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 class MainActivity : AppCompatActivity() {
@@ -21,6 +23,29 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val context = this
+
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    context as Activity,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+            ) {
+                return
+            } else {
+                // No explanation needed, we can request the permission.
+                requestLocationPermission(context)
+            }
+        }
+
 
         val filter = IntentFilter(IntentAction.NUM_OF_TICKS)
         registerReceiver(broadcastTickReceiver, filter)
@@ -103,5 +128,15 @@ class MainActivity : AppCompatActivity() {
     fun EnableStartButton(enable: Boolean, btnStart: Button, btnStop: Button) {
         btnStart.isEnabled = enable
         btnStop.isEnabled = !btnStart.isEnabled
+    }
+
+    private fun requestLocationPermission(context: Context) {
+        ActivityCompat.requestPermissions(
+            context as Activity,
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+            ),
+            99
+        )
     }
 }
