@@ -10,6 +10,7 @@ import android.graphics.Color
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
+import android.os.PowerManager
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import kotlinx.coroutines.*
@@ -82,10 +83,16 @@ class ForegroundTickService : Service(), CoroutineScope by MainScope() {
         return channelId
     }
 
+    override fun onCreate() {
+        super.onCreate()
+        acquireWakelock()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         val restartForegroundTickService = Intent(this, BroadcastTickReceiver::class.java).setAction(IntentAction.RESTART_FOREGROUND_TICK_SERVICE)
         sendBroadcast(restartForegroundTickService)
+        releaseWakelock()
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
@@ -93,4 +100,34 @@ class ForegroundTickService : Service(), CoroutineScope by MainScope() {
         val restartForegroundTickService = Intent(this, BroadcastTickReceiver::class.java).setAction(IntentAction.RESTART_FOREGROUND_TICK_SERVICE)
         sendBroadcast(restartForegroundTickService)
     }
+
+    private val wakeLock: PowerManager.WakeLock by lazy {
+        (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
+            newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "justanotherrealtimetrackingapp:ServiceWakelock")
+        }
+    }
+
+    private fun acquireWakelock() {
+        try {
+            wakeLock.let {
+                wakeLock.setReferenceCounted(false)
+                if (!wakeLock.isHeld) {
+                    wakeLock.acquire()
+                }
+            }
+        } catch (e: RuntimeException) {
+        }
+    }
+
+    private fun releaseWakelock() {
+        try {
+            wakeLock.let {
+                if (it.isHeld) {
+                    it.release()
+                }
+            }
+        } catch (e: RuntimeException) {
+        }
+    }
+
 }

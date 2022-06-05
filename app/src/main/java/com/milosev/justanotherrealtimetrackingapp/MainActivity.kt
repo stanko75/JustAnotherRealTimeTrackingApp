@@ -1,17 +1,21 @@
 package com.milosev.justanotherrealtimetrackingapp
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.*
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.PowerManager
+import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
@@ -46,6 +50,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        checkOptimization(context)
 
         val filter = IntentFilter(IntentAction.NUM_OF_TICKS)
         registerReceiver(broadcastTickReceiver, filter)
@@ -62,7 +67,7 @@ class MainActivity : AppCompatActivity() {
                             findViewById<View>(R.id.textViewNumberOfTicks) as TextView
                         numberOfTicks.text = numOfTicks.toString()
 
-                        EnableStartButton(false, btnStart, btnStop)
+                        enableStartButton(false, btnStart, btnStop)
 
                     }
                 }
@@ -72,11 +77,11 @@ class MainActivity : AppCompatActivity() {
         LocalBroadcastManager.getInstance(this)
             .registerReceiver(broadCastReceiver, IntentFilter(IntentAction.NUM_OF_TICKS))
 
-        EnableStartButton(true, btnStart, btnStop)
+        enableStartButton(true, btnStart, btnStop)
 
         btnStart.setOnClickListener {
 
-            EnableStartButton(false, btnStart, btnStop)
+            enableStartButton(false, btnStart, btnStop)
 
             val inputMethodManager =
                 getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -110,7 +115,7 @@ class MainActivity : AppCompatActivity() {
 
         btnStop.setOnClickListener {
 
-            EnableStartButton(true, btnStart, btnStop)
+            enableStartButton(true, btnStart, btnStop)
 
             val component = ComponentName(this, BroadcastTickReceiver::class.java)
             packageManager.setComponentEnabledSetting(
@@ -125,7 +130,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun EnableStartButton(enable: Boolean, btnStart: Button, btnStop: Button) {
+    fun enableStartButton(enable: Boolean, btnStart: Button, btnStop: Button) {
         btnStart.isEnabled = enable
         btnStop.isEnabled = !btnStart.isEnabled
     }
@@ -138,5 +143,17 @@ class MainActivity : AppCompatActivity() {
             ),
             99
         )
+    }
+
+    @SuppressLint("NewApi", "BatteryLife")
+    private fun checkOptimization(context: Context) {
+        val packageName = applicationContext.packageName
+        val pm = applicationContext.getSystemService(POWER_SERVICE) as PowerManager
+        if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+            val intent = Intent()
+            intent.action = ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+            intent.data = Uri.parse("package:" + context.packageName)
+            context.startActivity(intent)
+        }
     }
 }
