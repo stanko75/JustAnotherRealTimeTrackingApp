@@ -52,13 +52,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         checkOptimization(context)
-        openBatteryOptimization(context)
 
         val filter = IntentFilter(IntentAction.NUM_OF_TICKS)
         registerReceiver(broadcastTickReceiver, filter)
 
         val btnStop: Button = findViewById<View>(R.id.btnStop) as Button
         val btnStart: Button = findViewById<View>(R.id.btnStart) as Button
+        val btnOpenBatteryOptimization: Button = findViewById<View>(R.id.btnOpenBatteryOptimization) as Button
 
         val broadCastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
@@ -129,6 +129,10 @@ class MainActivity : AppCompatActivity() {
             val intentStopForegroundTickService = Intent(this, ForegroundTickService::class.java)
             intentStopForegroundTickService.action = IntentAction.STOP_FOREGROUND_TICK_SERVICE
             startForegroundService(intentStopForegroundTickService)
+        }
+
+        btnOpenBatteryOptimization.setOnClickListener {
+            openBatteryOptimization(this)
         }
     }
 
