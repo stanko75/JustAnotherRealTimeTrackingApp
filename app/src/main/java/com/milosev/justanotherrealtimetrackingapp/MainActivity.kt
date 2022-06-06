@@ -159,7 +159,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun openBatteryOptimization(context: Context) {
+    private fun openBatteryOptimization(context: Context) =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val intent = Intent()
             intent.action = Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
@@ -167,6 +167,5 @@ class MainActivity : AppCompatActivity() {
         } else {
             //Timber.d("Battery optimization not necessary")
         }
-    }
 
 }
