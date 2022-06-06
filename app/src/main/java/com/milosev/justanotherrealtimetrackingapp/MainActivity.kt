@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
+import android.provider.Settings
 import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -51,6 +52,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         checkOptimization(context)
+        openBatteryOptimization(context)
 
         val filter = IntentFilter(IntentAction.NUM_OF_TICKS)
         registerReceiver(broadcastTickReceiver, filter)
@@ -156,4 +158,15 @@ class MainActivity : AppCompatActivity() {
             context.startActivity(intent)
         }
     }
+
+    fun openBatteryOptimization(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val intent = Intent()
+            intent.action = Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
+            context.startActivity(intent)
+        } else {
+            //Timber.d("Battery optimization not necessary")
+        }
+    }
+
 }
