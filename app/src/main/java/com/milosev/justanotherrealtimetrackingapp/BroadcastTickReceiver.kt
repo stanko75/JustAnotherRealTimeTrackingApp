@@ -26,11 +26,11 @@ class BroadcastTickReceiver : BroadcastReceiver() {
             }
 
             IntentAction.STOP_FOREGROUND_TICK_SERVICE -> {
-                val restartForegroundTickServiceIntent = Intent(
+                val stopForegroundTickServiceIntent = Intent(
                     context,
                     ForegroundTickService::class.java
                 ).setAction(IntentAction.STOP_FOREGROUND_TICK_SERVICE)
-                context.startForegroundService(restartForegroundTickServiceIntent)
+                context.startForegroundService(stopForegroundTickServiceIntent)
             }
 
             IntentAction.NUM_OF_TICKS -> {
